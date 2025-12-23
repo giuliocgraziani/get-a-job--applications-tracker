@@ -263,6 +263,111 @@
             </svg>
         );
 
+        // Component to format notes with markdown-style syntax
+        const FormatNotes = ({ text }) => {
+          if (!text) return null;
+
+          const formatText = (input) => {
+            // Split by lines first to preserve line breaks
+            const lines = input.split('\n');
+            
+            return lines.map((line, lineIndex) => {
+              // Process each line for bold and italic
+              const parts = [];
+              let currentIndex = 0;
+              let partKey = 0;
+
+              // Regular expressions for formatting
+              // Bold: **text** or __text__
+              // Italic: *text* or _text_ (but not part of bold markers)
+              const boldRegex = /(\*\*|__)(.*?)\1/g;
+              const italicRegex = /(?<!\*|\w)(\*|_)(?!\1)(.*?)(?<!\*|\w)\1(?!\*)/g;
+
+              // First, find all bold matches
+              const boldMatches = [];
+              let boldMatch;
+              while ((boldMatch = boldRegex.exec(line)) !== null) {
+                boldMatches.push({
+                  start: boldMatch.index,
+                  end: boldMatch.index + boldMatch[0].length,
+                  text: boldMatch[2],
+                  type: 'bold'
+                });
+              }
+
+              // Then find all italic matches that don't overlap with bold
+              const italicMatches = [];
+              let italicMatch;
+              boldRegex.lastIndex = 0; // Reset regex
+              while ((italicMatch = italicRegex.exec(line)) !== null) {
+                const matchStart = italicMatch.index;
+                const matchEnd = italicMatch.index + italicMatch[0].length;
+                
+                // Check if this overlaps with any bold match
+                const overlaps = boldMatches.some(bold => 
+                  (matchStart >= bold.start && matchStart < bold.end) ||
+                  (matchEnd > bold.start && matchEnd <= bold.end)
+                );
+                
+                if (!overlaps) {
+                  italicMatches.push({
+                    start: matchStart,
+                    end: matchEnd,
+                    text: italicMatch[2],
+                    type: 'italic'
+                  });
+                }
+              }
+
+              // Combine and sort all matches
+              const allMatches = [...boldMatches, ...italicMatches].sort((a, b) => a.start - b.start);
+
+              // Build the formatted line
+              let lastIndex = 0;
+              const formattedParts = [];
+
+              allMatches.forEach((match, idx) => {
+                // Add text before the match
+                if (match.start > lastIndex) {
+                  formattedParts.push(
+                    <span key={`text-${lineIndex}-${idx}`}>{line.substring(lastIndex, match.start)}</span>
+                  );
+                }
+
+                // Add the formatted match
+                if (match.type === 'bold') {
+                  formattedParts.push(
+                    <strong key={`bold-${lineIndex}-${idx}`}>{match.text}</strong>
+                  );
+                } else if (match.type === 'italic') {
+                  formattedParts.push(
+                    <em key={`italic-${lineIndex}-${idx}`}>{match.text}</em>
+                  );
+                }
+
+                lastIndex = match.end;
+              });
+
+              // Add any remaining text
+              if (lastIndex < line.length) {
+                formattedParts.push(
+                  <span key={`text-${lineIndex}-end`}>{line.substring(lastIndex)}</span>
+                );
+              }
+
+              // Return the line with a break after it (except for the last line)
+              return (
+                <React.Fragment key={`line-${lineIndex}`}>
+                  {formattedParts.length > 0 ? formattedParts : line}
+                  {lineIndex < lines.length - 1 && <br />}
+                </React.Fragment>
+              );
+            });
+          };
+
+          return <div className="whitespace-pre-wrap">{formatText(text)}</div>;
+        };
+
         function EnhancedInternshipTracker() {
           const [applications, setApplications] = useState([]);
 
@@ -1252,7 +1357,7 @@
                                   View Notes
                                 </summary>
                                 <div className="mt-2 p-4 bg-indigo-50 rounded-lg text-sm text-gray-700">
-                                  {app.notes}
+                                  <FormatNotes text={app.notes} />
                                 </div>
                               </details>
                             )}
@@ -1809,10 +1914,18 @@
                         <textarea
                           value={formData.notes}
                           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                          rows={4}
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all resize-none"
-                          placeholder="Add any important notes about this position..."
+                          rows={8}
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all resize-y min-h-[150px]"
+                          placeholder="Add any important notes about this position...
+
+You can use formatting:
+**bold text** or __bold text__ for bold
+*italic text* or _italic text_ for italic
+Press Enter for line breaks"
                         />
+                        <p className="text-xs text-gray-500 mt-2">
+                          💡 Tip: Use **bold** or __bold__, *italic* or _italic_, and line breaks. Drag the bottom-right corner to expand the text box.
+                        </p>
                       </div>
 
                       {/* Action Buttons */}
@@ -2027,7 +2140,7 @@
                         <div className="border-t border-gray-200 pt-6">
                           <h4 className="text-lg font-semibold text-gray-900 mb-3">Notes</h4>
                           <div className="p-4 bg-indigo-50 rounded-lg text-gray-700">
-                            {viewingApp.notes}
+                            <FormatNotes text={viewingApp.notes} />
                           </div>
                         </div>
                       )}
