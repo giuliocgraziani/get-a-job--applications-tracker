@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enhanced Internship Tracker - TrackTern</title>
+    <title>Get-a-Job | Application Tracker</title>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -369,7 +369,42 @@
         };
 
         function EnhancedInternshipTracker() {
-          const [applications, setApplications] = useState([]);
+          // Load data from localStorage on initial mount
+          const loadFromLocalStorage = () => {
+            try {
+              const saved = localStorage.getItem('tracktern-applications');
+              return saved ? JSON.parse(saved) : [];
+            } catch (error) {
+              console.error('Error loading from localStorage:', error);
+              return [];
+            }
+          };
+
+          const loadCategoriesFromLocalStorage = () => {
+            try {
+              const saved = localStorage.getItem('tracktern-categories');
+              if (saved) {
+                return JSON.parse(saved);
+              }
+            } catch (error) {
+              console.error('Error loading categories:', error);
+            }
+            // Default categories
+            return [
+              'International Organisation',
+              'Generic Public Sector',
+              'Central Bank',
+              'Research Centre',
+              'Development Bank',
+              'Economic Consultancy',
+              'University Faculty',
+              'Lobby',
+              'Miscellaneous Firm'
+            ];
+          };
+
+          const [applications, setApplications] = useState(loadFromLocalStorage);
+          const [availableCategories, setAvailableCategories] = useState(loadCategoriesFromLocalStorage);
 
           const [view, setView] = useState('list'); // 'list', 'calendar', or 'compact'
           const [isModalOpen, setIsModalOpen] = useState(false);
@@ -380,6 +415,24 @@
           const [showStatusBreakdown, setShowStatusBreakdown] = useState(false);
           const [selectedMonth, setSelectedMonth] = useState(new Date());
           const [showFilters, setShowFilters] = useState(false);
+
+          // Save applications to localStorage whenever they change
+          React.useEffect(() => {
+            try {
+              localStorage.setItem('tracktern-applications', JSON.stringify(applications));
+            } catch (error) {
+              console.error('Error saving to localStorage:', error);
+            }
+          }, [applications]);
+
+          // Save categories to localStorage whenever they change
+          React.useEffect(() => {
+            try {
+              localStorage.setItem('tracktern-categories', JSON.stringify(availableCategories));
+            } catch (error) {
+              console.error('Error saving categories:', error);
+            }
+          }, [availableCategories]);
 
           const [filters, setFilters] = useState({
             status: [],
@@ -413,17 +466,6 @@
 
           const [newDeadline, setNewDeadline] = useState({ name: '', date: '' });
           const [customCategory, setCustomCategory] = useState('');
-          const [availableCategories, setAvailableCategories] = useState([
-            'International Organisation',
-            'Generic Public Sector',
-            'Central Bank',
-            'Research Centre',
-            'Development Bank',
-            'Economic Consultancy',
-            'University Faculty',
-            'Lobby',
-            'Miscellaneous Firm'
-          ]);
 
           const statusOptions = [
             { value: 'upcoming', label: 'Upcoming', color: '#E879F9' },
@@ -669,7 +711,7 @@
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.setAttribute('href', url);
-            link.setAttribute('download', `internship-applications-${new Date().toISOString().split('T')[0]}.csv`);
+            link.setAttribute('download', `job-applications-${new Date().toISOString().split('T')[0]}.csv`);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
@@ -695,7 +737,7 @@
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             link.setAttribute('href', url);
-            link.setAttribute('download', `tracktern-backup-${new Date().toISOString().split('T')[0]}.json`);
+            link.setAttribute('download', `getajob-backup-${new Date().toISOString().split('T')[0]}.json`);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
@@ -730,6 +772,29 @@
             };
             reader.readAsText(file);
             event.target.value = ''; // Reset file input
+          };
+
+          // Clear all data (for starting fresh)
+          const clearAllData = () => {
+            if (confirm('⚠️ This will delete ALL applications and custom categories. This cannot be undone!\n\nAre you sure you want to continue?')) {
+              if (confirm('Really delete everything? Consider making a backup first!')) {
+                setApplications([]);
+                setAvailableCategories([
+                  'International Organisation',
+                  'Generic Public Sector',
+                  'Central Bank',
+                  'Research Centre',
+                  'Development Bank',
+                  'Economic Consultancy',
+                  'University Faculty',
+                  'Lobby',
+                  'Miscellaneous Firm'
+                ]);
+                localStorage.removeItem('tracktern-applications');
+                localStorage.removeItem('tracktern-categories');
+                alert('All data cleared successfully!');
+              }
+            }
           };
 
           const generateCalendar = () => {
@@ -775,7 +840,7 @@
                       <h1 className="text-5xl font-bold text-gray-900 mb-2 tracking-tight">
                         Your Applications
                       </h1>
-                      <p className="text-gray-600 text-lg">Manage and track all your internship applications</p>
+                      <p className="text-gray-600 text-lg">Manage and track all your job applications</p>
                     </div>
                     <div className="flex gap-2 flex-wrap">
                       {/* Export CSV Button */}
