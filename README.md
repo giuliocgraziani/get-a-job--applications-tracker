@@ -2,7 +2,7 @@
 
 A powerful, feature-rich web application for tracking internship applications. Built with React, runs entirely in your browser - no backend required.
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-blue?style=for-the-badge&logo=github)](https://giuliocgraziani.github.io/applications-tracker/)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-blue?style=for-the-badge&logo=github)](https://giuliocgraziani.github.io/get-a-job--applications-tracker/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 ## ✨ Features
