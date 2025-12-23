@@ -1,11 +1,9 @@
-# TrackTern - Internship Application Tracker
+# Giulio's Application Tracker
 
 A powerful, feature-rich web application for tracking internship applications. Built with React, runs entirely in your browser - no backend required.
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-blue?style=for-the-badge&logo=github)](https://yourusername.github.io/tracktern/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
-
-![TrackTern Screenshot](screenshot.png)
 
 ## ✨ Features
 
@@ -126,22 +124,8 @@ Narrow down your applications:
 
 ## 🔐 Privacy
 
-All data is stored locally in your browser. Nothing is sent to any server. Your application data never leaves your device.
+All data is stored locally in your browser. Nothing is sent to any server. Your application data never leaves your device. MAKE SURE TO BACKUP YOUR PROGRESS or you risk losing it all if your browser's metadata gets deleted.
 
 ## 📄 License
 
 MIT License - Free to use, modify, and distribute.
-
-## 🤝 Contributing
-
-Found a bug? Have a feature request? Feel free to open an issue!
-
-## ⭐ Show Your Support
-
-If this project helped you track your internship applications, give it a star! ⭐
-
----
-
-**Built with ❤️ for students navigating internship applications**
-
-Last Updated: December 2024
