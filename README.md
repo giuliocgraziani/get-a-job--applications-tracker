@@ -37,7 +37,7 @@ A powerful, feature-rich web application for tracking internship applications. B
 Simply visit the [Live Demo](https://yourusername.github.io/tracktern/)
 
 ### Option 2: Download and Run Locally
-1. Download `enhanced-internship-tracker-v2.html`
+1. Download `index.html`
 2. Open it in any modern browser (Chrome, Firefox, Safari, Edge)
 3. Start tracking your applications!
 
